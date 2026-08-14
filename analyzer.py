@@ -107,10 +107,25 @@ def analyze_3d_telemetry(filepath):
                         send_discord_alert(p_id, anomaly_counters[p_id], reason_msg)
                         already_flagged.add(p_id)
 
-            # Keep 3D coordinates updated in the user map profile
+                     # Keep 3D coordinates updated in the user map profile
             prof["last_client_time"] = c_time
             prof["last_server_time"] = s_time
             prof["x"], prof["y"], prof["z"] = x, y, z
 
+    # --- NEW TRACKING CONFIRMATION BLOCK ---
+    print("\n" + "="*45)
+    print("🎯 TELEMETRY PIPELINE DISPATCH SUMMARY")
+    print("="*45)
+    print(f"Status: SUCCESS (Process complete)")
+    print(f"Total Unique Players Tracked: {len(player_profiles)}")
+    
+    # Check if anyone actually triggered an alert
+    if len(already_flagged) == 0:
+        print("Result: CLEAN MATCH (No suspicious activity or anomalies detected).")
+    else:
+        print(f"Result: ANOMALIES DETECTED. Flagged users: {list(already_flagged)}")
+    print("="*45 + "\n")
+
 # Run the 3D analytics tracking pass
 analyze_3d_telemetry("telemetry.json")
+
