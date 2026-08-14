@@ -1,0 +1,13 @@
+{
+    "discord_settings": {
+        "webhook_url": "https://discord.com"
+    },
+    "game_physics_limits": {
+        "max_allowed_speed": 15.0,
+        "min_packet_interval_seconds": 0.05
+    },
+    "detection_thresholds": {
+        "required_anomalies_to_flag": 3,
+        "critical_headshot_streak": 5
+    }
+}
