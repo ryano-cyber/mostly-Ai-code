@@ -1,26 +1,29 @@
+# -----------------------------------------------------------------------------
+# Telemetry Analysis Engine - MIT License Notice
+# Copyright (c) 2026 Your Name. All rights reserved.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR LIABILITY.
+# -----------------------------------------------------------------------------
+
 from datetime import datetime, timezone
 import json
 import math
 import urllib.request
 
 def load_application_config(config_filepath="config.json"):
-    """Reads the external JSON configuration file customized by the user."""
     try:
         with open(config_filepath, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        print(f"[CRITICAL ERROR] Missing '{config_filepath}' file! Restoring internal defaults.")
-        # Fallback defaults if the customer accidentally deletes the file
         return {
             "discord_settings": {"webhook_url": ""},
             "game_physics_limits": {"max_allowed_speed": 15.0, "min_packet_interval_seconds": 0.05},
-            "detection_thresholds": {"required_anomalies_to_flag": 3, "critical_headshot_streak": 5}
+            "detection_thresholds": {"required_anomalies_to_flag": 3}
         }
 
-# --- Load settings dynamically ---
 CONFIG = load_application_config()
-
-# Assign config variables smoothly for the rest of the script logic
 DISCORD_WEBHOOK_URL = CONFIG["discord_settings"]["webhook_url"]
 MAX_ALLOWED_SPEED = CONFIG["game_physics_limits"]["max_allowed_speed"]
 MIN_PACKET_INTERVAL = CONFIG["game_physics_limits"]["min_packet_interval_seconds"]
@@ -35,7 +38,7 @@ def send_discord_alert(username, violation_count, details):
     payload = {
         "username": "Telemetry Sentinel",
         "embeds": [{
-            "title": "🚨 DISCREPANCY LIMIT REACHED",
+            "title": "🚨 3D DISCREPANCY LIMIT REACHED",
             "color": 15158332,  
             "fields": [
                 {"name": "Suspected Account", "value": f"`{username}`", "inline": True},
@@ -43,7 +46,7 @@ def send_discord_alert(username, violation_count, details):
                 {"name": "Violation Flag Type", "value": details, "inline": False}
             ],
             "timestamp": current_utc_time,
-            "footer": {"text": "System Incident Clock Time"}
+            "footer": {"text": "3D Physics Engine Tracker"}
         }]
     }
     data = json.dumps(payload).encode('utf-8')
@@ -52,11 +55,11 @@ def send_discord_alert(username, violation_count, details):
     try:
         with urllib.request.urlopen(req) as response:
             if response.status == 204:
-                print(f"[DISCORD] Notification sent for user: {username}")
+                print(f"[DISCORD] 3D Vector alert sent for user: {username}")
     except Exception as e:
         print(f"[DISCORD ERROR] Failed to send webhook: {e}")
 
-def analyze_telemetry_file(filepath):
+def analyze_3d_telemetry(filepath):
     try:
         with open(filepath, "r") as file:
             telemetry_data = json.load(file)
@@ -74,31 +77,40 @@ def analyze_telemetry_file(filepath):
         c_time = entry["client_time"]
         s_time = entry["server_receive_time"]
 
+        # Track x, y, and z state vectors
         if p_id not in player_profiles:
-            player_profiles[p_id] = {"last_client_time": None, "last_server_time": None, "x": None, "y": None}
+            player_profiles[p_id] = {"last_client_time": None, "last_server_time": None, "x": None, "y": None, "z": None}
             anomaly_counters[p_id] = 0
 
         prof = player_profiles[p_id]
 
         if event == "position":
-            x, y = entry["x"], entry["y"]
+            x, y, z = entry["x"], entry["y"], entry["z"]
+            
             if prof["last_client_time"] is not None:
                 server_dt = s_time - prof["last_server_time"]
                 client_dt = c_time - prof["last_client_time"]
-                distance = math.sqrt((x - prof["x"])**2 + (y - prof["y"])**2)
+                
+                # --- NEW MATH BLOCK: 3D Euclidean Distance ---
+                distance_3d = math.sqrt(
+                    (x - prof["x"])**2 + 
+                    (y - prof["y"])**2 + 
+                    (z - prof["z"])**2
+                )
 
-                speed = distance / client_dt if (server_dt < MIN_PACKET_INTERVAL and client_dt > server_dt) else (distance / server_dt if server_dt > 0 else 0)
+                speed = distance_3d / client_dt if (server_dt < MIN_PACKET_INTERVAL and client_dt > server_dt) else (distance_3d / server_dt if server_dt > 0 else 0)
 
                 if speed > MAX_ALLOWED_SPEED:
                     anomaly_counters[p_id] += 1
                     if anomaly_counters[p_id] >= REQUIRED_ANOMALIES_TO_FLAG and p_id not in already_flagged:
-                        reason_msg = f"Velocity limit violation ({MAX_ALLOWED_SPEED} units/s exceeded)."
+                        reason_msg = f"3D velocity boundary breached. Speed calculated at {round(speed, 2)} units/s (Max limit: {MAX_ALLOWED_SPEED})."
                         send_discord_alert(p_id, anomaly_counters[p_id], reason_msg)
                         already_flagged.add(p_id)
 
+            # Keep 3D coordinates updated in the user map profile
             prof["last_client_time"] = c_time
             prof["last_server_time"] = s_time
-            prof["x"], prof["y"] = x, y
+            prof["x"], prof["y"], prof["z"] = x, y, z
 
-# Execute using our data file
-analyze_telemetry_file("telemetry.json")
+# Run the 3D analytics tracking pass
+analyze_3d_telemetry("telemetry.json")
