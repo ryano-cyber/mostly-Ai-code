@@ -1,0 +1,7 @@
+# Hide the configuration file containing private webhooks/keys
+config.json
+
+# Hide local telemetry logs and review files
+telemetry.json
+review_roster.json
+cs2_server.log
