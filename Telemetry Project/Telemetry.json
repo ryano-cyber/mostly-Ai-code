@@ -1,6 +1,0 @@
-[
-    {"player_id": "shadow_v0id", "event": "position", "client_time": 0.0, "server_receive_time": 100.0, "x": 50.0, "y": 50.0},
-    {"player_id": "shadow_v0id", "event": "position", "client_time": 0.1, "server_receive_time": 100.1, "x": 95.0, "y": 95.0}, 
-    {"player_id": "shadow_v0id", "event": "position", "client_time": 0.2, "server_receive_time": 100.2, "x": 150.0, "y": 150.0}, 
-    {"player_id": "shadow_v0id", "event": "position", "client_time": 0.3, "server_receive_time": 100.3, "x": 210.0, "y": 210.0}
-]
