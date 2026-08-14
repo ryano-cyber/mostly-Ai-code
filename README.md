@@ -1,53 +1,26 @@
-# 🚨 3D Behavioral Telemetry Analysis Pipeline
+# 🚨 3D Behavioral Telemetry Engine & Live Lobby Scanner
 
-A server-side validation engine written in Python that analyzes multiplayer match data streams for physical anomalies and mechanical discrepancies (such as flying, teleportation, aim-locking, and weapon fire-rate manipulation). 
+A modular, server-side validation system written in Python that automatically scans active match logs to ingest player lists and monitors live telemetry data arrays for 3D physics boundaries.
 
-This system operates as a deterministic heuristic processing engine, validating telemetry vectors using 3D physics boundaries rather than scanning client-side device memory.
+## 🛠️ System Architecture & Automated Features
 
-## 🛠️ System Architecture & Features
-
-The pipeline is split into four distinct behavioral analytics layers:
-* **Deterministic 3D Velocity Tracking:** Uses 3D Euclidean distance calculations across X, Y, and Z axes ($v = \sqrt{\Delta x^2 + \Delta y^2 + \Delta z^2} / \Delta t$) to find true straight-line velocity vectors. This catches players flying or teleporting vertically through maps.
-* **Packet-Loss Protection Filter:** Compares client simulation timestamps against real server arrival schedules to distinguish between a malicious speed hack and network congestion (packet bursting).
-* **Confidence Aggregator:** Implements an incident counter threshold to filter out random position glitches and minimize false-positive alerts.
-* **Combat Streak Analytics:** Monitors hit classifications to detect impossible headshot streaks without natural positional variance.
-* **API Alert Router:** Packages validation logs into JSON objects and pushes rich formatting embeds with automated localized timestamps to a private administrative Discord channel.
+* **Automated Name Extraction:** Employs an asynchronous log watcher using RegEx processing patterns to pull live usernames out of connection text traces (`lobby.log`) the exact millisecond they join a match.
+* **Deterministic 3D Velocity Tracking:** Uses 3D Euclidean distance calculations ($v = \sqrt{\Delta x^2 + \Delta y^2 + \Delta z^2} / \Delta t$) to monitor vector thresholds.
+* **Network Burst Shield:** Measures server network arrival timing differences against client clock steps to handle packet-loss compression spikes smoothly.
+* **Discord Integration Layer:** Packages incident summaries into JSON payloads and dispatches localized alerts to private operational server nodes.
 
 ## 🗂️ Project Repository Layout
 
-* `analyzer.py` - Core Python engine executing the 3D mathematical validation rules.
-* `config.json` - System configuration dashboard for thresholds and network settings.
+* `analyzer.py` - Core multi-threaded Python engine running the background file watchers.
+* `config.json` - System threshold limits dashboard configuration parameters.
 * `LICENSE` - Commercial protection under the MIT software liability shield.
-* `.gitignore` - Production security file ensuring private webhooks are never pushed to the cloud.
+* `.gitignore` - Production security file preventing sensitive token data leaks.
 
 ## 🚀 Installation & Execution
 
-### 1. Repository Setup
-Clone or download the project files into your local runtime directory, then configure your system boundaries using the configuration template:
-
-```json
-{
-    "discord_settings": {
-        "webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE"
-    },
-    "game_physics_limits": {
-        "max_allowed_speed": 15.0,
-        "min_packet_interval_seconds": 0.05
-    },
-    "detection_thresholds": {
-        "required_anomalies_to_flag": 3,
-        "critical_headshot_streak": 5
-    }
-}
-```
-
-### 2. Execution Command
-Run the logging engine through your command-line environment:
-
-```bash
-python analyzer.py
-```
-
-## 📜 Liability & Licensing
-
-Distributed under the **MIT License**. The system is provided entirely **"as is"** without warranty of any kind. Review the `LICENSE` file in the root folder for complete liability limitations.
+1. Configure your private destination endpoints inside `config.json`.
+2. Start the continuous automated folder execution monitor pipeline:
+   ```bash
+   python analyzer.py
+   ```
+3. Append incoming console text data directly into `lobby.log` to watch the engine parse live configurations instantly.
